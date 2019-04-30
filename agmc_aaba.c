@@ -7,6 +7,7 @@ typedef struct Node {
     int height;
 } Node;
 
+
 Node *newNode(int value) {
     Node *aux = malloc(sizeof(Node));
     aux->value = value;
@@ -15,19 +16,23 @@ Node *newNode(int value) {
     return aux;
 }
 
+
 int getHeight(Node *node) {
     if (node == NULL) return -1;
     return node->height;
 }
 
-int getBalanceFactor(Node *node) {
+
+int getBalance(Node *node) {
     if (node == NULL) return 0;
     return getHeight(node->left) - getHeight(node->right);
 }
 
+
 int getMax(int right, int left) {
     return (right > left) ? right : left;
 }
+
 
 Node *rotateLeft(Node *node) {
     Node *right_child = node->right;
@@ -41,6 +46,7 @@ Node *rotateLeft(Node *node) {
 
     return right_child;
 }
+
 
 Node *rotateRight(Node *node) {
     Node *left_child = node->left;
@@ -57,7 +63,7 @@ Node *rotateRight(Node *node) {
 
 Node *reorganizeTree(Node *root, int value) {
     root->height = getMax(getHeight(root->left), getHeight(root->right)) + 1;
-    int balance = getBalanceFactor(root);
+    int balance = getBalance(root);
 
     // LEFT LEFT CASE
     if (balance > 1 && value < root->left->value) return rotateRight(root);
@@ -69,6 +75,7 @@ Node *reorganizeTree(Node *root, int value) {
     if (balance > 1 && value > root->left->value) {
         root->left = rotateLeft(root->left);
         return rotateRight(root);
+
     }
 
     // RIGHT LEFT CASE
@@ -80,6 +87,7 @@ Node *reorganizeTree(Node *root, int value) {
     return root;
 }
 
+
 Node *insertNode(Node *root, int value) {
     if (root == NULL) return newNode(value);
     else if (value < root->value) root->left = insertNode(root->left, value);
@@ -89,18 +97,25 @@ Node *insertNode(Node *root, int value) {
     return reorganizeTree(root, value);
 }
 
-int printIndex(Node *root, int main_root_data, int index, int value){
+int printIndex(Node *root, int index, int value){
     if (root != NULL) {
-        index = printIndex(root->left, main_root_data, index, value);
+        index = printIndex(root->left, index, value);
         index++;
-        
+        if(index == 0) return -1;
+
         if (root->value == value){
             printf("%d\n", index);
             return -1;
         }
-        if (index == 0) return -1;
-        index = printIndex(root->right, main_root_data, index, value);
-        if (root->value == main_root_data) printf("Data tidak ada\n");
+
+
+        if (root->value > value){
+            printf("Data tidak ada\n");
+            return -1;
+        }
+        
+        index = printIndex(root->right, index, value);
+        // if (root->value == main_root_data) printf("Data tidak ada\n");
     }
 
     return index;
@@ -117,13 +132,14 @@ int main() {
         scanf("%d", &query_type);
         scanf("%d", &value);
 
-        if (query_type == 1) {
+        if (query_type == 1){
             root = insertNode(root, value);
             main_root_data = root->value;
-            continue;
         }
-        index = 0;
-        printIndex(root, main_root_data, index, value);
+        else if (query_type == 2){
+            index = 0;
+            printIndex(root, index, value);
+        }
     }
     return 0;
 }
